@@ -1,10 +1,12 @@
 # Importing details from various classes
 from spy_details import spy, Spy, ChatMessage, friends
 from steganography.steganography import Steganography
+from termcolor import colored
+
 from datetime import datetime
 
 # Initializing a list containing status messages
-STATUS_MESSAGES = ['My name is Bond, James Bond', 'Shaken, not stirred.', 'Keeping the British end up, Sir']
+STATUS_MESSAGES = ['My name is Udit, James Bond', 'Sleeping', 'Keeping the British end up, Sir']
 
 print "Hello! Let\'s get started !!"
 
@@ -99,8 +101,11 @@ def select_a_friend():
     friend_choice = raw_input("Choose from your friends")
 
     friend_choice_position = int(friend_choice) - 1
-
-    return friend_choice_position
+    if friend_choice_position < len(friends):
+        return friend_choice_position
+    else:
+        print 'Choose from the people given above'
+        exit()
 
 
 def send_message():
@@ -110,13 +115,16 @@ def send_message():
     original_image = raw_input("What is the name of the image?")
     output_path = "output.jpg"
     text = raw_input("What do you want to say? ")
-    Steganography.encode(original_image, output_path, text)
+    if len(text) >0:
+        Steganography.encode(original_image, output_path, text)
 
-    new_chat = ChatMessage(text,True)
+        new_chat = ChatMessage(text,True)
 
-    friends[friend_choice].chats.append(new_chat)
+        friends[friend_choice].chats.append(new_chat)
 
-    print "Your secret message image is ready!"
+        print "Your secret message image is ready!"
+    else:
+        print 'Enter a valid message '
 
 
 def read_message():
@@ -126,26 +134,34 @@ def read_message():
     output_path = raw_input("What is the name of the file?")
 
     secret_text = Steganography.decode(output_path)
+    if len(secret_text) > 0:
 
-    new_chat = ChatMessage(secret_text,False)
+        new_chat = ChatMessage(secret_text,False)
 
-    friends[sender].chats.append(new_chat)
-    
-    print "Your secret message has been saved!"
+        friends[sender].chats.append(new_chat)
+
+        print "Your secret message has been saved!"
+    else:
+        print 'Empty message'
 
 
 def read_chat_history():
 
     read_for = select_a_friend()
 
-    print '\n6'
+    print '\n'
 
     for chat in friends[read_for].chats:
 
         if chat.sent_by_me:
-            print '[%s] %s: %s' % (chat.time.strftime("%d %B %Y"), 'You said:', chat.message)
+            print '[%s]' % (colored([chat.time.strftime("%d %B %Y")] ,'blue'))
+            print '%s:' % (colored('You said:','red'))
+            print '%s:' % (colored(chat.message,'yellow'))
         else:
-            print '[%s] %s said: %s' % (chat.time.strftime("%d %B %Y"), friends[read_for].name, chat.message)
+            print '[%s] ' % (colored([chat.time.strftime("%d %B %Y")],'blue'))
+            print '%s said:' %(colored((friends[read_for].name),'red'))
+            print ' %s ' % (colored((chat.message),'yellow'))
+
 
 def display_msg_acc_spy_rating(spy):
 
